@@ -1,7 +1,7 @@
 import { authApi } from "@/api/authApi"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { authKeys } from "./api-keys";
-import { IUser } from "@/types/user-types";
+import { User } from "@/types/user-types";
 
 
 export function useLogin() {
@@ -51,8 +51,8 @@ export function useGetMe({ isEnabled }: { isEnabled: boolean }) {
     return useQuery({
         queryKey: authKeys.currentUser(),
         queryFn: async () => {
-            const response = await authApi.getMe() as { user: IUser };
-            return response.user;
+            const user = await authApi.getMe() as User;
+            return user;
         },
         enabled: isEnabled,
         retry: false,

@@ -33,7 +33,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (isPublicRoute) {
       if (user && !isLoading && !isError && isRedirectOnAuthRoute) {
-        router.push("/dashboard");
+        router.push("/homefeed");
         setIsAuth(true);
         return;
       }

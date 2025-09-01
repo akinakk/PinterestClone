@@ -59,7 +59,7 @@ export default function NotFound() {
 
             <div className="flex justify-center">
               <button
-                onClick={() => router.push("/dashboard")}
+                onClick={() => router.push("/homefeed")}
                 className="inline-flex items-center rounded-lg cursor-pointer bg-blue-600 px-6 py-2.5 font-medium text-white transition-all duration-200 hover:bg-blue-700"
               >
                 <svg

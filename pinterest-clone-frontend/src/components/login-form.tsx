@@ -52,7 +52,7 @@ export function LoginForm({
         message?: string;
       };
       toast.success(res.message || "Login successful");
-      router.push("/dashboard");
+      router.push("/homefeed");
     } catch (err: unknown) {
       let message = "Something went wrong, please try again";
       if (isAxiosError(err)) {

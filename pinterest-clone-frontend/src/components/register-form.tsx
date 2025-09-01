@@ -59,7 +59,7 @@ export function RegisterForm({
         password,
       })) as { message?: string };
       toast.success(res.message || "Account created successfully!");
-      router.push("/dashboard");
+      router.push("/homefeed");
     } catch (err: unknown) {
       let message = "Registration failed. Please try again.";
       if (isAxiosError(err)) {
