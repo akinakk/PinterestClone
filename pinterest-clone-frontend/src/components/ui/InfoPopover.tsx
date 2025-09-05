@@ -49,7 +49,7 @@ export default function InfoPopover() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.98 }}
             transition={{ duration: 0.32, ease: [0.4, 0, 0.2, 1] }}
-            className="absolute bottom-14 left-0 w-80 min-w-[280px] bg-white rounded-2xl border border-gray-200 p-6 flex flex-col gap-4"
+            className="absolute bottom-14 left-0 w-80 min-w-[280px] bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200 p-6 flex flex-col gap-4"
           >
             <div className="flex items-center gap-3 mb-2">
               <div className="p-2 bg-red-50 rounded-full">
