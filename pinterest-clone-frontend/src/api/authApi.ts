@@ -38,7 +38,7 @@ export const authApi = {
 
     logout: async () => {
         try {
-            const response = await apiClient.post("/auth/logout")
+            const response = await apiClient.post("/me/logout")
             return response.data
         } catch (error) {
             throw error

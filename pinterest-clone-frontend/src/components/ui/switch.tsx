@@ -8,7 +8,7 @@ const switchVariants = cva(
         variants: {
             variant: {
                 default:
-                    "focus-visible:ring-blue-500 data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-200",
+                    "focus-visible:ring-red-500 data-[state=checked]:bg-red-600 data-[state=unchecked]:bg-gray-200",
                 destructive:
                     "focus-visible:ring-red-500 data-[state=checked]:bg-red-600 data-[state=unchecked]:bg-gray-200",
                 success:
@@ -63,7 +63,7 @@ const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
                 onClick={() => onCheckedChange?.(!checked)}
                 className={cn(
                     switchVariants({ variant, size }),
-                    checked ? "bg-blue-600" : "bg-gray-200",
+                    checked ? "bg-red-600" : "bg-gray-200",
                     className,
                 )}
                 ref={ref}

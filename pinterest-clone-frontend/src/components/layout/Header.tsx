@@ -1,11 +1,13 @@
 import { useRouter } from "next/dist/client/components/navigation";
 import Image from "next/image";
 import { useState } from "react";
+import { useLogout } from "@/hooks/auth";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Header() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { mutate: logout } = useLogout();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 w-full bg-white/80 backdrop-blur-xl border-b border-gray-200 text-sm py-2.5">
@@ -271,7 +273,13 @@ export default function Header() {
                     </div>
 
                     <div className="space-y-3 sm:space-y-4 sm:col-span-2 md:col-span-1">
-                      <button className="p-2 sm:p-3 flex items-start gap-3 sm:gap-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer w-full text-left">
+                      <button 
+                      className="p-2 sm:p-3 flex items-start gap-3 sm:gap-4 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer w-full text-left"
+                      onClick={() => {
+                        logout();
+                        router.push('/auth/sign-in');
+                      }}
+                      >
                         <svg
                           className="size-4 mt-1 flex-shrink-0"
                           fill="none"

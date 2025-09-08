@@ -7,7 +7,7 @@ import "ldrs/react/Trio.css";
 export function Loader() {
   return (
     <div className="flex justify-center items-center h-full">
-      <Trio size={30} speed={1.3} color="#2261ffaa" />
+      <Trio size={30} speed={1.3} color="#E60023" />
     </div>
   );
 }
@@ -15,7 +15,7 @@ export function Loader() {
 export function LoaderTrioRed() {
   return (
     <div className="flex justify-center items-center h-full">
-      <Trio size={20} speed={1.3} color="#e53e3eaa" />
+      <Trio size={20} speed={1.3} color="#E60023" />
     </div>
   );
 }
@@ -23,7 +23,7 @@ export function LoaderTrioRed() {
 export function LoaderTrio() {
   return (
     <div className="flex justify-center items-center h-full">
-      <Trio size={20} speed={1.3} color="#2261ffaa" />
+      <Trio size={20} speed={1.3} color="#E60023" />
     </div>
   );
 }

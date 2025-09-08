@@ -10,6 +10,93 @@ import (
 	"time"
 )
 
+const addPinToCollection = `-- name: AddPinToCollection :exec
+INSERT INTO collection_pins (collection_id, pin_id)
+VALUES ($1, $2)
+ON CONFLICT (collection_id, pin_id) DO NOTHING
+`
+
+type AddPinToCollectionParams struct {
+	CollectionID int64 `json:"collection_id"`
+	PinID        int64 `json:"pin_id"`
+}
+
+// Collection pins queries
+func (q *Queries) AddPinToCollection(ctx context.Context, arg AddPinToCollectionParams) error {
+	_, err := q.db.Exec(ctx, addPinToCollection, arg.CollectionID, arg.PinID)
+	return err
+}
+
+const createCollection = `-- name: CreateCollection :one
+INSERT INTO collections (user_id, name, description, is_private)
+VALUES ($1, $2, $3, $4)
+RETURNING id, user_id, name, description, is_private, created_at, updated_at
+`
+
+type CreateCollectionParams struct {
+	UserID      int64   `json:"user_id"`
+	Name        string  `json:"name"`
+	Description *string `json:"description"`
+	IsPrivate   *bool   `json:"is_private"`
+}
+
+// Collections queries
+func (q *Queries) CreateCollection(ctx context.Context, arg CreateCollectionParams) (Collection, error) {
+	row := q.db.QueryRow(ctx, createCollection,
+		arg.UserID,
+		arg.Name,
+		arg.Description,
+		arg.IsPrivate,
+	)
+	var i Collection
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Name,
+		&i.Description,
+		&i.IsPrivate,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const createPin = `-- name: CreatePin :one
+INSERT INTO pins (user_id, title, description, image_url, source_url)
+VALUES ($1, $2, $3, $4, $5)
+RETURNING id, user_id, title, description, image_url, source_url, created_at
+`
+
+type CreatePinParams struct {
+	UserID      int64   `json:"user_id"`
+	Title       string  `json:"title"`
+	Description *string `json:"description"`
+	ImageUrl    string  `json:"image_url"`
+	SourceUrl   *string `json:"source_url"`
+}
+
+// Pins queries
+func (q *Queries) CreatePin(ctx context.Context, arg CreatePinParams) (Pin, error) {
+	row := q.db.QueryRow(ctx, createPin,
+		arg.UserID,
+		arg.Title,
+		arg.Description,
+		arg.ImageUrl,
+		arg.SourceUrl,
+	)
+	var i Pin
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Title,
+		&i.Description,
+		&i.ImageUrl,
+		&i.SourceUrl,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const createSession = `-- name: CreateSession :exec
 insert into
     sessions (
@@ -106,6 +193,116 @@ func (q *Queries) DestroySession(ctx context.Context, sid string) error {
 	return err
 }
 
+const getAllPins = `-- name: GetAllPins :many
+SELECT id, user_id, title, description, image_url, source_url, created_at
+FROM pins
+ORDER BY created_at DESC
+`
+
+func (q *Queries) GetAllPins(ctx context.Context) ([]Pin, error) {
+	rows, err := q.db.Query(ctx, getAllPins)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Pin
+	for rows.Next() {
+		var i Pin
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Title,
+			&i.Description,
+			&i.ImageUrl,
+			&i.SourceUrl,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getCollection = `-- name: GetCollection :one
+SELECT id, user_id, name, description, is_private, created_at, updated_at
+FROM collections WHERE id = $1
+`
+
+func (q *Queries) GetCollection(ctx context.Context, id int64) (Collection, error) {
+	row := q.db.QueryRow(ctx, getCollection, id)
+	var i Collection
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Name,
+		&i.Description,
+		&i.IsPrivate,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getCollectionPins = `-- name: GetCollectionPins :many
+SELECT p.id, p.user_id, p.title, p.description, p.image_url, p.source_url, p.created_at
+FROM pins p
+JOIN collection_pins cp ON p.id = cp.pin_id
+WHERE cp.collection_id = $1
+ORDER BY cp.added_at DESC
+`
+
+func (q *Queries) GetCollectionPins(ctx context.Context, collectionID int64) ([]Pin, error) {
+	rows, err := q.db.Query(ctx, getCollectionPins, collectionID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Pin
+	for rows.Next() {
+		var i Pin
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Title,
+			&i.Description,
+			&i.ImageUrl,
+			&i.SourceUrl,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getPinByID = `-- name: GetPinByID :one
+SELECT id, user_id, title, description, image_url, source_url, created_at
+FROM pins WHERE id = $1
+`
+
+func (q *Queries) GetPinByID(ctx context.Context, id int64) (Pin, error) {
+	row := q.db.QueryRow(ctx, getPinByID, id)
+	var i Pin
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Title,
+		&i.Description,
+		&i.ImageUrl,
+		&i.SourceUrl,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const getUserByEmail = `-- name: GetUserByEmail :one
 select id, password from users where email = $1
 `
@@ -145,6 +342,40 @@ func (q *Queries) GetUserByID(ctx context.Context, id int64) (GetUserByIDRow, er
 	return i, err
 }
 
+const getUserCollections = `-- name: GetUserCollections :many
+SELECT id, user_id, name, description, is_private, created_at, updated_at
+FROM collections WHERE user_id = $1
+ORDER BY created_at DESC
+`
+
+func (q *Queries) GetUserCollections(ctx context.Context, userID int64) ([]Collection, error) {
+	rows, err := q.db.Query(ctx, getUserCollections, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Collection
+	for rows.Next() {
+		var i Collection
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Name,
+			&i.Description,
+			&i.IsPrivate,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getUserEmailByID = `-- name: GetUserEmailByID :one
 select email from users where id = $1
 `
@@ -170,6 +401,55 @@ func (q *Queries) GetUserIDBySession(ctx context.Context, arg GetUserIDBySession
 	var user_id int64
 	err := row.Scan(&user_id)
 	return user_id, err
+}
+
+const getUserPins = `-- name: GetUserPins :many
+SELECT id, user_id, title, description, image_url, source_url, created_at
+FROM pins WHERE user_id = $1
+ORDER BY created_at DESC
+`
+
+func (q *Queries) GetUserPins(ctx context.Context, userID int64) ([]Pin, error) {
+	rows, err := q.db.Query(ctx, getUserPins, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Pin
+	for rows.Next() {
+		var i Pin
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Title,
+			&i.Description,
+			&i.ImageUrl,
+			&i.SourceUrl,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const removePinFromCollection = `-- name: RemovePinFromCollection :exec
+DELETE FROM collection_pins 
+WHERE collection_id = $1 AND pin_id = $2
+`
+
+type RemovePinFromCollectionParams struct {
+	CollectionID int64 `json:"collection_id"`
+	PinID        int64 `json:"pin_id"`
+}
+
+func (q *Queries) RemovePinFromCollection(ctx context.Context, arg RemovePinFromCollectionParams) error {
+	_, err := q.db.Exec(ctx, removePinFromCollection, arg.CollectionID, arg.PinID)
+	return err
 }
 
 const updateSessionExpiration = `-- name: UpdateSessionExpiration :exec

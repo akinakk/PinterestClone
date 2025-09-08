@@ -3,7 +3,7 @@ import Profile from "@/components/layout/Profile";
 import { div } from "framer-motion/client";
 
 export const metadata = {
-  title: "profile - Pinterest",
+  title: "Profile - Pinterest",
   description: "Your profile overview",
 };
 

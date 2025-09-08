@@ -3,6 +3,7 @@ import { useGetMe } from "@/hooks/auth";
 import { useAuthStore } from "@/zustand/auth-state";
 import { useRouter, usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { Loader } from "@/components/ui/Loader";
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const [isAuth, setIsAuth] = useState<boolean | null>(null);
@@ -13,8 +14,6 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const publicRoutes = [
     "/auth/sign-in",
     "/auth/sign-up",
-    "/terms-of-service",
-    "/privacy-policy",
   ];
   const redirectOnAuthRoutes = ["/auth/sign-in", "/auth/sign-up"];
 
@@ -76,7 +75,10 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   if (!isPublicRoute && (isAuth === null || isLoading)) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900"></div>
+        <div className="text-center">
+          <Loader />
+          <p className="text-gray-600 mt-4">Authenticating...</p>
+        </div>
       </div>
     );
   }

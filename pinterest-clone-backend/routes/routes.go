@@ -28,20 +28,45 @@ func SetupRoutes() *chi.Mux {
 
 	router.Route("/api", func(r chi.Router) {
 
-		// Public user routes
+		// Public routes
 		r.Route("/users", func(r chi.Router) {
 			r.Post("/register", controllers.RegisterUser)
 			r.Post("/login", controllers.LoginUser)
+		})
+
+		r.Route("/pins", func(r chi.Router) {
+			r.Get("/", controllers.GetAllPins)
+			r.Get("/{id}", controllers.GetPinByID)
+
+			r.Group(func(r chi.Router) {
+				r.Use(middleware.Protect)
+				r.Post("/", controllers.CreatePin)
+				r.Post("/create-mock", controllers.CreateMockPins)
+			})
+		})
+
+		r.Route("/collections", func(r chi.Router) {
+			r.Get("/{id}/pins", controllers.GetCollectionPins)
+
+			r.Group(func(r chi.Router) {
+				r.Use(middleware.Protect)
+				r.Get("/", controllers.GetUserCollections)
+				r.Post("/", controllers.CreateCollection)
+				r.Get("/{id}", controllers.GetCollectionWithPins)
+				r.Post("/{id}/pins", controllers.AddPinToCollection)
+				r.Delete("/{collectionId}/pins/{pinId}", controllers.RemovePinFromCollection)
+			})
 		})
 
 		// protected routes
 		r.Group(func(r chi.Router) {
 			r.Use(middleware.Protect)
 
-			// User management endpoints
 			r.Route("/me", func(r chi.Router) {
 				r.Get("/", controllers.GetMe)
 				r.Post("/logout", controllers.Logout)
+				r.Get("/pins", controllers.GetUserPins)
+				r.Get("/collections", controllers.GetUserCollections)
 			})
 		})
 	})

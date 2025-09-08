@@ -6,7 +6,36 @@ package sqlc
 
 import (
 	"time"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
+
+type Collection struct {
+	ID          int64            `json:"id"`
+	UserID      int64            `json:"user_id"`
+	Name        string           `json:"name"`
+	Description *string          `json:"description"`
+	IsPrivate   *bool            `json:"is_private"`
+	CreatedAt   pgtype.Timestamp `json:"created_at"`
+	UpdatedAt   pgtype.Timestamp `json:"updated_at"`
+}
+
+type CollectionPin struct {
+	ID           int64            `json:"id"`
+	CollectionID int64            `json:"collection_id"`
+	PinID        int64            `json:"pin_id"`
+	AddedAt      pgtype.Timestamp `json:"added_at"`
+}
+
+type Pin struct {
+	ID          int64            `json:"id"`
+	UserID      int64            `json:"user_id"`
+	Title       string           `json:"title"`
+	Description *string          `json:"description"`
+	ImageUrl    string           `json:"image_url"`
+	SourceUrl   *string          `json:"source_url"`
+	CreatedAt   pgtype.Timestamp `json:"created_at"`
+}
 
 type Session struct {
 	Sid       string    `json:"sid"`
