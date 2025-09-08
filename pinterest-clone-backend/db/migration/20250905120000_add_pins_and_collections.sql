@@ -1,7 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
 
--- Таблица для коллекций (досок)
 CREATE TABLE collections (
     id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -12,7 +11,6 @@ CREATE TABLE collections (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Таблица для пинов
 CREATE TABLE pins (
     id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -23,7 +21,6 @@ CREATE TABLE pins (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Таблица для связи пинов и коллекций (many-to-many)
 CREATE TABLE collection_pins (
     id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     collection_id BIGINT NOT NULL REFERENCES collections(id) ON DELETE CASCADE,
@@ -32,7 +29,6 @@ CREATE TABLE collection_pins (
     UNIQUE(collection_id, pin_id)
 );
 
--- Индексы для производительности
 CREATE INDEX idx_collections_user_id ON collections(user_id);
 CREATE INDEX idx_pins_user_id ON pins(user_id);
 CREATE INDEX idx_collection_pins_collection_id ON collection_pins(collection_id);
